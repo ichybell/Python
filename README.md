@@ -12,6 +12,6 @@ Note:
 
 >Any file with **additional** or **plus** appended at the end is content I was able to additionally research online and use during the specific topic referenced at that chapter of the book
 
->My game that was to be created is a Word_Descrambler project which aims to form words from a series of letters provided. It can also be referred to as a Word Finder
+>My game that was to be created is a Word_Descrambler project which aims to form words from a series of letters provided. It can also be referred to as a Word Finder. I aim to incremetally improve it as well.
 
 >The image that is located at the gothonwebs project is the image I used to test the upload module
