@@ -1,55 +1,44 @@
-from flask import Flask
+#This is the app.py module from exercise 51
+
+from flask import Flask, session, redirect, url_for, escape, request
 from flask import render_template
-from flask import request
-from werkzeug.utils import secure_filename
+from gothonweb import planisphere
 
 app = Flask(__name__)
 
-
-@app.route('/')
-def hello_world():
-    greeting = "Hello World"
-    return render_template("index.html", greeting=greeting)
-
-@app.route('/upload', methods = ['GET', 'POST'])
-def upload_file():
-    if request.method == "POST":
-        f = request.files['file']
-        f.save(f.filename)
-        name = f.filename
-        return f'{name} uploaded successfully'
-    else:
-        return render_template('upload.html')
-@app.route('/salut')
-def salut_monde():
-    francais = "Salut tout le monde"
-    return render_template("foo.html", greeting=francais)
-
-@app.route('/hello', methods = ['GET', 'POST'])
+@app.route('/', methods = ['GET', 'POST'])
 def index():
+    # this is used to "setup" the session with starting values
+    session['room_name'] = planisphere.START
+    return redirect(url_for("game"))
 
-    if request.method == "POST":
-        name = request.form['name']
-        greet = request.form['greet']
-# The line below is an addition to check if user fills the form and if not,
-# returns a message back to the user requiring the form to be filled
-        if name and greet:
-            greeting = f"{greet}, {name}"
-            return render_template("index.html", greeting=greeting)
+@app.route("/game", methods=['GET', 'POST'])
+def game():
+    room_name = session.get('room_name')
+
+    if request.method == "GET":
+        if room_name:
+            room = planisphere.load_room(room_name)
+            return render_template("show_room.html", room=room)
         else:
-            return render_template("hello_form_error.html")
+            # why is there here? do you need it?
+            return render_template("you_died.html")
     else:
-        return render_template("hello_form.html")
-#    name = request.args.get('name', 'Nobody')
-#    greet = request.args.get('greet', 'Hello')
+        action = request.form.get('action')
 
-#    if name:
-#        greeting = f"{greet}, {name}"
-#    else:
-#        greeting = "Hello World"
+        if room_name and action:
+            room = planisphere.load_room(room_name)
+            next_room = room.go(action)
 
-#    return render_template("index.html", greeting=greeting)
+            if not next_room:
+                session['room_name'] = planisphere.name_room(room)
+            else:
+                session['room_name'] = planisphere.name_room(next_room)
 
+        return redirect(url_for("game"))
+
+# YOU SHOULD CHANGE THIS IF YOU PUT ON THE INTERNET
+app.secret_key = 'A0Zr98j/3yX R~XHH!jmN]LWX/,?RT'
 
 if __name__ == "__main__":
     app.run()
